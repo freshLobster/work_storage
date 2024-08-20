@@ -9,7 +9,7 @@
 #include <Adafruit_MSA301.h>
 #include <Adafruit_Sensor.h>
 
-Adafruit_MSA301 msa;
+Adafruit_MSA311 msa;
 
 // This file provides a crude way to "drop in" user code to the eyes,
 // allowing concurrent operations without having to maintain a bunch of

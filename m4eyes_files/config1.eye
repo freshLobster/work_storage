@@ -12,8 +12,8 @@
   // The doom-red and doom-spiral eyelid bitmaps don't fully close.
   // This is to give the IMPRESSION of a blink without actually blinking,
   // so human eye behind is hidden better when doing Pepper's ghost trick.
-  //"upperEyelid"    : "doom-spiral/upper.bmp",
-  //"lowerEyelid"    : "doom-spiral/lower.bmp",
+  //"upperEyelid"    : "upper.bmp",
+  //"lowerEyelid"    : "lower.bmp",
   "left" : {
     "irisSpin"     : 80    // Rotate iris @ 80 RPM
   },

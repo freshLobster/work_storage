@@ -31,8 +31,11 @@ Adafruit_MSA311 msa;
 // a lot of time to initialize, make periodic calls to yield() to keep the
 // USB mass storage filesystem alive.
 void user_setup(void) {
+  #ifdef DEBUG
   Serial.begin(115200);
-  while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
+
+  while (!Serial) yield();     // will pause Zero, Leonardo, etc until serial console opens
+  #endif
 
   #ifdef DEBUG
   Serial.println("Adafruit MSA311 test!");

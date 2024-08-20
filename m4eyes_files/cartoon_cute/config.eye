@@ -11,8 +11,8 @@
   "pupilMin"      : 0.3,
   "pupilMax"      : 0.4,
   "squint"        : 0.1,
-  "upperEyelid"   : "cartoon_cute/upper.bmp",
-  "lowerEyelid"   : "cartoon_cute/lower.bmp",
+  "upperEyelid"   : "upper.bmp",
+  "lowerEyelid"   : "lower.bmp",
   "left" : {
   },
   "right" : {

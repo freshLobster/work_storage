@@ -22,6 +22,8 @@ FASTLED_USING_NAMESPACE
 #define COLOR_ORDER GBR
 #define NUM_LEDS    19
 CRGB leds[NUM_LEDS];
+bool on[19] = {0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0};
+
 
 #define BRIGHTNESS          80
 #define FRAMES_PER_SECOND  120
@@ -40,7 +42,7 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { cylon, rainbow, rainbowWithGlitter, cylon, confetti, sinelon, cylon, juggle, bpm };
+SimplePatternList gPatterns = {eyes, lookLeft, lookRight};//{ cylon, rainbow, rainbowWithGlitter, cylon, confetti, sinelon, cylon, juggle, bpm };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
@@ -155,4 +157,45 @@ void cylon(){
 		// Wait a little bit before we loop around and do it again
 		delay(50);
 	}
+}
+
+void eyes(){
+  static uint8_t hue = 0;
+  for(int i = 19; i > 0; --i){
+    on[i] ? leds[i] = CHSV(hue, 255, 255) : CHSV(hue, 0, 0);
+  }
+  FastLED.show();
+  FastLED.delay(random16(10230));
+  blink();
+
+}
+void lookLeft(){
+  uint8_t hue = 0;
+  for(int i = 19; i > 0; --i){
+    on[i] && i >= 0 ? leds[i-1] = CHSV(hue, 255, 255) : CHSV(hue, 0, 0);
+  }
+  FastLED.show();
+  FastLED.delay(random16(1023));
+  blink();
+
+  eyes();
+}
+
+void lookRight(){
+  uint8_t hue = 0;
+  for(int i = 19; i > 0; --i){
+    on[i] && i<19 ? leds[i+1] = CHSV(hue, 255, 255) : CHSV(hue, 0, 0);
+  }
+  FastLED.show();
+  FastLED.delay(random16(1023));
+  blink();
+
+  eyes();
+}
+
+void blink(){
+  fadeToBlackBy(leds, NUM_LEDS, random8(255));
+  FastLED.clear();
+  FastLED.delay(random16(800));
+  FastLED.show();
 }

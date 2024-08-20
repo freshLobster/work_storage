@@ -172,9 +172,11 @@ uint32_t availableRAM(void) {
 // SETUP FUNCTION - CALLED ONCE AT PROGRAM START ---------------------------
 
 void setup() {
+  #ifdef DEBUG
   Serial.begin(115200);
   //while(!Serial) yield();
-
+  #endif
+  
   if(!arcada.arcadaBegin())     fatal("Arcada init fail!", 300);
 #if defined(USE_TINYUSB)
   if(!arcada.filesysBeginMSD()) fatal("No filesystem found!", 2500);
@@ -297,7 +299,7 @@ void setup() {
 
   yield();
 
-  batt_check();
+  //batt_check();
 
   uint32_t startTime, elapsed;
   if (showSplashScreen) {
