@@ -3,6 +3,7 @@
 /// @example DemoReel100.ino
 
 #include <FastLED.h>
+#include <Button.h>
 
 FASTLED_USING_NAMESPACE
 
@@ -14,58 +15,79 @@ FASTLED_USING_NAMESPACE
 // animations patterns and have them automatically rotate.
 //
 // -Mark Kriegsman, December 2014
-#include <DailyStruggleButton.h>
+//#include <DailyStruggleButton.h>
 
-#define DATA_PIN    D7
+#define DATA_PIN    D9
 #define CLK_PIN     D8
 #define LED_TYPE    APA102
 #define COLOR_ORDER BGR
 #define NUM_LEDS    19
-#define button1     D0
-#define button2     D1
+#define BUTTON_C     D0
+#define BUTTON_A     D1
+#define DEBUG
 
 CRGB leds[NUM_LEDS];
-DailyStruggleButton colorButt;
-DailyStruggleButton patButt;  
+//DailyStruggleButton colorButt;
+//DailyStruggleButton patButt;  
 
 
-#define BRIGHTNESS          80
+#define BRIGHTNESS          60
 #define FRAMES_PER_SECOND  120
+
+
+//#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 void setup() {
   delay(3000); // 3 second delay for recovery
+  
+  #ifdef DEBUG
   Serial.begin(115200);
+  #endif
+
   // tell FastLED about the LED strip configuration
   //FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   
-  pinMode(button1, INPUT_PULLDOWN);
-  pinMode(button2, INPUT_PULLDOWN);
-
-  colorButt.set(button2, changeColor, EXT_PULL_DOWN);
- 
-  patButt.set(button1, changePattern, EXT_PULL_DOWN);
-
-
-  //attachInterrupt(button1, nextPattern, RISING);
-  //attachInterrupt(button2, changeColor, RISING);
+  pinMode(BUTTON_C, INPUT_PULLDOWN);
+  pinMode(BUTTON_A, INPUT_PULLDOWN);
 
 
   // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setBrightness(BRIGHTNESS/4);
 }
 
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
 SimplePatternList gPatterns = { solid, eyes, sinelon, confetti, bpm, juggle, rainbow, rainbowWithGlitter};
+uint8_t gPatternLength = 8;
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 uint8_t colorIndex = 0;
-uint8_t hues[8] = {HUE_RED, HUE_ORANGE, HUE_YELLOW, HUE_GREEN, HUE_AQUA, HUE_BLUE, HUE_PURPLE , HUE_PINK};
+uint8_t hues[] = {HUE_RED, HUE_RED, HUE_RED, HUE_ORANGE, HUE_ORANGE, HUE_ORANGE, HUE_YELLOW, HUE_YELLOW, HUE_YELLOW,
+                           HUE_GREEN, HUE_GREEN, HUE_GREEN, HUE_AQUA, HUE_AQUA, HUE_AQUA, HUE_BLUE, HUE_BLUE, HUE_BLUE, 
+                           HUE_PURPLE, HUE_PURPLE, HUE_PURPLE, HUE_PINK, HUE_PINK, HUE_PINK, 42, 42, 42};
+uint8_t huesLength = 27;
 bool on[NUM_LEDS] = {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1};
+uint8_t brightness[3] = {BRIGHTNESS/4, BRIGHTNESS/2, BRIGHTNESS};
+uint8_t brightLength = 3;
 bool rainbowMode = false;
+uint8_t brightIndex = 0;
+
+int buttonStateC;            // the current reading from the input pin
+int lastButtonStateC = LOW;  // the previous reading from the input pin
+
+int buttonStateA;            // the current reading from the input pin
+int lastButtonStateA = LOW;  
+
+// the following variables are unsigned longs because the time, measured in
+// milliseconds, will quickly become a bigger number than can be stored in an int.
+unsigned long lastDebounceTimeC = 0;  // the last time the output pin was toggled
+unsigned long lastDebounceTimeA = 0;
+
+unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
+
   
 void loop()
 {
@@ -78,51 +100,113 @@ void loop()
   FastLED.show();  
   
   // insert a delay to keep the framerate modest
-  FastLED.delay(1000/FRAMES_PER_SECOND); 
+  FastLED.delay(1000/FRAMES_PER_SECOND);
+   // read the state of the switch into a local variable:
+  int readingA = digitalRead(BUTTON_A);
+
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH), and you've waited long enough
+  // since the last press to ignore any noise:
+
+  // If the switch changed, due to noise or pressing:
+  if (readingA != lastButtonStateA) {
+    // reset the debouncing timer
+    lastDebounceTimeA = millis();
+  }
+
+  if ((millis() - lastDebounceTimeA) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer than the debounce
+    // delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (readingA != buttonStateA) {
+      buttonStateA = readingA;
+
+      // only toggle the LED if the new button state is HIGH
+      if (buttonStateA == HIGH) {
+        changePattern();
+      }
+    }
+  }
+  // read the state of the switch into a local variable:
+  int readingC = digitalRead(BUTTON_C);
+
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH), and you've waited long enough
+  // since the last press to ignore any noise:
+
+  // If the switch changed, due to noise or pressing:
+  if (readingC != lastButtonStateC) {
+    // reset the debouncing timer
+    lastDebounceTimeC = millis();
+  }
+
+  if ((millis() - lastDebounceTimeC) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer than the debounce
+    // delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (readingC != buttonStateC) {
+      buttonStateC = readingC;
+
+      // only toggle the LED if the new button state is HIGH
+      if (buttonStateC == HIGH) {
+        changeColor();
+      }
+    }
+  }
+
+  // save the reading. Next time through the loop, it'll be the lastButtonState:
+  lastButtonStateC = readingC;
+  lastButtonStateA = readingA;
+
+
 
   // do some periodic updates
-  EVERY_N_MILLISECONDS( 20 ) { if (rainbowMode) gHue++; } // slowly cycle the "base color" through the rainbow
-  //EVERY_N_MILLISECONDS( 15 ) { patButt.poll(); } 
-  //EVERY_N_SECONDS( 10 ) { nextPattern(); } // change patterns periodically
-  colorButt.poll();
-  patButt.poll();
-  
+  EVERY_N_MILLISECONDS( 80 ) { if (rainbowMode) gHue++; } // slowly cycle the "base color" through the rainbow
+
 }
 
-void changeColor(byte btnStatus){
-  switch ( btnStatus ){
-    case onPress:
-      //if ( rainbowMode ) rainbowMode = false;  
-      (colorIndex < 8) ? colorIndex++ : colorIndex = 0;
-      if (colorIndex == 8) {
+
+
+void changeColor(){
+  
+      ( colorIndex < (huesLength) ) ? colorIndex++ : colorIndex = 0;
+      
+      if ( hues[colorIndex] == 42 ) {
         rainbowMode = true;
       }else{
         rainbowMode = false;
       }
-      gHue = hues[colorIndex];
-      Serial.println("Color Button Pressed");
-      break;
+      gHue = hues[ colorIndex ];
+      brightIndex = colorIndex % brightLength;
+      FastLED.setBrightness( brightness[brightIndex] );
 
-  }
+      
+      #ifdef DEBUG
+      Serial.println("Color Button Pressed");
+      #endif
+
   
 }
 
-void changePattern(byte btnStatus){
-  if ( btnStatus == onPress ){ 
+void changePattern(){
     nextPattern();
+    #ifdef DEBUG
     Serial.println("Pattern Button Pressed");
-  }
+    #endif
+  
 }
 
 
 void fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
 
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+//#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 void nextPattern()
 {
   // add one to the current pattern number, and wrap around at the end
-  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
+  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % gPatternLength;
 }
 
 void rainbow() 
