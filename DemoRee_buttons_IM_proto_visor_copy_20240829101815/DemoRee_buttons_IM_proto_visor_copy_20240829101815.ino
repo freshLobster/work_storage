@@ -67,7 +67,7 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 uint8_t colorIndex = 0;
 uint8_t hues[] = {HUE_RED, HUE_RED, HUE_RED, HUE_ORANGE, HUE_ORANGE, HUE_ORANGE, HUE_YELLOW, HUE_YELLOW, HUE_YELLOW,
                            HUE_GREEN, HUE_GREEN, HUE_GREEN, HUE_AQUA, HUE_AQUA, HUE_AQUA, HUE_BLUE, HUE_BLUE, HUE_BLUE, 
-                           HUE_PURPLE, HUE_PURPLE, HUE_PURPLE, HUE_PINK, HUE_PINK, HUE_PINK, 42, 42, 42};
+                           HUE_PURPLE, HUE_PURPLE, HUE_PURPLE, HUE_PINK, HUE_PINK, HUE_PINK, HUE_RED, HUE_GREEN, HUE_BLUE};
 uint8_t huesLength = 27;
 bool on[NUM_LEDS] = {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1};
 uint8_t brightness[3] = {BRIGHTNESS/4, BRIGHTNESS/2, BRIGHTNESS};
@@ -163,7 +163,7 @@ void loop()
 
 
   // do some periodic updates
-  EVERY_N_MILLISECONDS( 80 ) { if (rainbowMode) gHue++; } // slowly cycle the "base color" through the rainbow
+  EVERY_N_MILLISECONDS( 20 ) { if (rainbowMode) gHue++; } // slowly cycle the "base color" through the rainbow
 
 }
 
@@ -171,10 +171,13 @@ void loop()
 
 void changeColor(){
   
-      ( colorIndex < (huesLength) ) ? colorIndex++ : colorIndex = 0;
+      ( colorIndex < (huesLength -1) ) ? colorIndex++ : colorIndex = 0;
       
-      if ( hues[colorIndex] == 42 ) {
+      if ( colorIndex >= (huesLength - 3) ) {
         rainbowMode = true;
+        #ifdef DEBUG
+        Serial.println("rainbow power activated!");
+        #endif
       }else{
         rainbowMode = false;
       }
@@ -213,6 +216,7 @@ void rainbow()
 {
   // FastLED's built-in rainbow generator
   fill_rainbow( leds, NUM_LEDS, gHue, 7);
+
 }
 
 void rainbowWithGlitter() 
