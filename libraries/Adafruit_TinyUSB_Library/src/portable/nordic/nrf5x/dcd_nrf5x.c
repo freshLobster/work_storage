@@ -230,9 +230,11 @@ static void xact_in_dma(uint8_t epnum) {
 //--------------------------------------------------------------------+
 // Controller API
 //--------------------------------------------------------------------+
-void dcd_init(uint8_t rhport) {
-  TU_LOG2("dcd init\r\n");
+bool dcd_init(uint8_t rhport, const tusb_rhport_init_t* rh_init) {
   (void) rhport;
+  (void) rh_init;
+  TU_LOG2("dcd init\r\n");
+  return true;
 }
 
 void dcd_int_enable(uint8_t rhport) {
@@ -441,11 +443,11 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t* buffer, uint16_t to
   bool const control_status = (epnum == 0 && total_bytes == 0 && dir != tu_edpt_dir(NRF_USBD->BMREQUESTTYPE));
 
   if (control_status) {
-    // Status Phase also requires EasyDMA has to be available as well !!!!
-    edpt_dma_start(&NRF_USBD->TASKS_EP0STATUS);
-
     // The nRF doesn't interrupt on status transmit so we queue up a success response.
     dcd_event_xfer_complete(0, ep_addr, 0, XFER_RESULT_SUCCESS, is_in_isr());
+
+    // Status Phase also requires EasyDMA has to be available as well !!!!
+    edpt_dma_start(&NRF_USBD->TASKS_EP0STATUS);
   } else if (dir == TUSB_DIR_OUT) {
     xfer->started = true;
     if (epnum == 0) {

@@ -31,7 +31,7 @@ CRGB leds[NUM_LEDS];
 //DailyStruggleButton patButt;  
 
 
-#define BRIGHTNESS          60
+#define BRIGHTNESS          68
 #define FRAMES_PER_SECOND  120
 
 
