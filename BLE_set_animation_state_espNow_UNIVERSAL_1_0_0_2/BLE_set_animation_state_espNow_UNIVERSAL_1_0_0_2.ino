@@ -53,6 +53,8 @@
 #include "esp_sleep.h"
 #include "esp_pm.h"
 
+#define VERSION "1.0.0.2"
+
 //#define SLAVE
 #define MASTER
 
@@ -208,6 +210,8 @@ void initBLE() {
 void setup() {
 
   Serial.begin(115200);
+  Serial.print("Version: ");
+  Serial.println(VERSION);
 
   // Create the BLE Device
   initBLE();  
@@ -245,7 +249,7 @@ void setup() {
   clearAll();
 
 
-  /*
+  ///*
   //Security
   BLESecurity *pSecurity = new BLESecurity();
   pSecurity->setCapability(ESP_IO_CAP_NONE);
@@ -253,7 +257,7 @@ void setup() {
   pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
   pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
   pSecurity->setKeySize(16);
-  */
+  //*/
 
 
   delay(10);
