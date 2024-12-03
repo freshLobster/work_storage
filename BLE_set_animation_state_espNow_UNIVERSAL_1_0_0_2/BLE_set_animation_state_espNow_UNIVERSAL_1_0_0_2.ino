@@ -1,6 +1,10 @@
 
 
-//MASTER
+//UNIVERSAL
+//v1.0.0.2
+//Aidan Seine
+//Originally for Immortal Masks "Screwball"
+//BLE control of Hallowing M4 LCD animated eye modules
 
 
 //BLE
@@ -8,19 +12,35 @@
   Based on Neil Kolban example for IDF: https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/tests/BLE%20Tests/SampleNotify.cpp
   Ported to Arduino ESP32 by Evandro Copercini
   updated by chegewara and MoThunderz
+  Modified and Frankensteined for Immortal Masks by Aidan Seine
 */
 //EspNow
 /**
    ESPNOW - Basic communication - Master
    Date: 26th September 2017
    Author: Arvind Ravulavaru <https://github.com/arvindr21>
+   Modified and Frankensteined for Immortal Masks by Aidan Seine
    Purpose: ESPNow Communication between a Master ESP32 and a Slave ESP32
-   Description: This sketch consists of the code for the Master module.
+   Description: This sketch consists of the code for both the Master and Slave modules
    Resources: (A bit outdated)
    a. https://espressif.com/sites/default/files/documentation/esp-now_user_guide_en.pdf
    b. http://www.esploradores.com/practica-6-conexion-esp-now/
 
-   << This Device Master >>
+UNIVERSAL code:
+November 6, 2024
+
+Master and Slave versions of code are both in this file as they share some functionalities
+and I didnt feel like making two independent files. Also keeps the espNow stuff understandable
+by being able to see both parts in one file. 
+
+Use the the #define for the version you want and //comment out the other one
+For example: #define MASTER for Master modules
+           //#define SLAVE
+           and
+           //#define MASTER for Slave modules
+             #define SLAVE 
+
+-Aidan Seine (@inseinefx)
 
    Flow: Master
    Step 1 : ESPNow Init on Master and set it in STA mode
@@ -249,7 +269,7 @@ void setup() {
   clearAll();
 
 
-  ///*
+  /*
   //Security
   BLESecurity *pSecurity = new BLESecurity();
   pSecurity->setCapability(ESP_IO_CAP_NONE);
@@ -257,7 +277,7 @@ void setup() {
   pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
   pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
   pSecurity->setKeySize(16);
-  //*/
+  */
 
 
   delay(10);
