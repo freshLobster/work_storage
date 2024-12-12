@@ -75,8 +75,8 @@ For example: #define MASTER for Master modules
 
 #define VERSION "1.0.0.2"
 
-//#define SLAVE
-#define MASTER
+#define SLAVE
+//#define MASTER
 
 //#define FUN_DEBUG
 
@@ -230,6 +230,7 @@ void initBLE() {
 void setup() {
 
   Serial.begin(115200);
+  delay(30);
   Serial.print("Version: ");
   Serial.println(VERSION);
 
@@ -599,6 +600,9 @@ void setup() {
   digitalWrite(reset, HIGH);
   clearAll();
   Serial.begin(115200);
+  delay(30);
+  Serial.print("Version: ");
+  Serial.println(VERSION);
   Serial.println("screwball_debug SLAVE");
   //Set device in AP mode to begin with
   WiFi.mode(WIFI_AP);
