@@ -75,8 +75,8 @@ For example: #define MASTER for Master modules
 
 #define VERSION "1.0.0.2"
 
-#define SLAVE
-//#define MASTER
+//#define SLAVE
+#define MASTER
 
 //#define FUN_DEBUG
 
